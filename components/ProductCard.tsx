@@ -20,7 +20,6 @@ const ProductCard = ({ product }: { product: Product }) => {
     <TouchableOpacity
       onPress={() => router.push(`/product/${product.id}`)}
       className="m-2 gap-2 rounded-lg bg-white p-4 shadow-[0_0_10px_rgba(0,0,0,0.1)]"
-      activeOpacity={0.8}
       style={{ width: CARD_WIDTH }}
     >
       <Image

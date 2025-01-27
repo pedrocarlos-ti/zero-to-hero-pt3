@@ -16,7 +16,18 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <Stack>
-        <Stack.Screen name="index" options={{ title: "Zaara" }} />
+        <Stack.Screen
+          name="index"
+          options={{
+            title: "Zaara",
+            headerShadowVisible: false,
+            headerSearchBarOptions: {
+              placeholder: "Search",
+              hideWhenScrolling: true,
+              hideNavigationBar: true,
+            },
+          }}
+        />
       </Stack>
     </QueryClientProvider>
   );

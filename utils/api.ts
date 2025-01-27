@@ -9,7 +9,6 @@ export interface Product {
   image: string;
   rating: Rating;
 }
-
 export interface Rating {
   rate: number;
   count: number;
@@ -28,7 +27,7 @@ export const getProduct = async (id: number): Promise<Product> => {
 };
 
 export const getProductsByCategory = async (
-  category: string
+  category: string,
 ): Promise<Product[]> => {
   const response = await fetch(`${API_URL}/category/${category}`);
   const data = await response.json();
