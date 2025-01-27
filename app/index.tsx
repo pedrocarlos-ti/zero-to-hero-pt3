@@ -1,11 +1,16 @@
 import { Text, View } from "react-native";
-import { getProducts, getCategories } from "@/utils/api";
+import { getProducts, getCategories, Product } from "@/utils/api";
 import { useQuery } from "@tanstack/react-query";
+import { FlashList } from "@shopify/flash-list";
+import { useCallback } from "react";
+import ProductCard from "@/components/ProductCard";
 
 export default function Index() {
   const {
     data: products,
     isLoading,
+    isRefetching,
+    refetch,
     error,
   } = useQuery({
     queryKey: ["products"],
@@ -17,22 +22,23 @@ export default function Index() {
     queryFn: getCategories,
   });
 
-  console.log({ products, categories });
-
-  if (isLoading) return <Text>Loading...</Text>;
-  if (error) return <Text>Error: {error.message}</Text>;
+  const renderProduct = useCallback(({ item }: { item: Product }) => {
+    return <ProductCard product={item} />;
+  }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text className="text-xl text-blue-500">
-        Edit app/index.tsx to edit this screen.
-      </Text>
+    <View className="flex-1 bg-white">
+      <FlashList
+        data={products}
+        renderItem={renderProduct}
+        ListEmptyComponent={<Text>No products found</Text>}
+        estimatedItemSize={200}
+        numColumns={2}
+        contentContainerStyle={{ padding: 8 }}
+        keyExtractor={(item) => item.id.toString()}
+        refreshing={isRefetching}
+        onRefresh={refetch}
+      />
     </View>
   );
 }
