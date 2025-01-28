@@ -1,7 +1,8 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useCartStore } from "@/store/cartStore";
 import { Image } from "expo-image";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
 
 export default function Cart() {
   const { products, removeProduct, clearCart, updateQuantity } = useCartStore();
@@ -10,6 +11,14 @@ export default function Cart() {
     (sum, product) => sum + product.price * product.quantity,
     0,
   );
+
+  const animatedTotal = useSharedValue(1);
+  const handleUpdateQuantity = (productId: number, quantity: number) => {
+    updateQuantity(productId, quantity);
+    animatedTotal.value = withSpring(1.2, {}, () => {
+      animatedTotal.value = withSpring(1);
+    });
+  };
 
   if (products.length === 0) {
     return (
@@ -52,7 +61,7 @@ export default function Cart() {
                   <TouchableOpacity
                     onPress={() => {
                       if (product.quantity > 1) {
-                        updateQuantity(product.id, product.quantity - 1);
+                        handleUpdateQuantity(product.id, product.quantity - 1);
                       } else {
                         removeProduct(product.id);
                       }
@@ -71,7 +80,7 @@ export default function Cart() {
 
                   <TouchableOpacity
                     onPress={() =>
-                      updateQuantity(product.id, product.quantity + 1)
+                      handleUpdateQuantity(product.id, product.quantity + 1)
                     }
                   >
                     <Ionicons
@@ -97,9 +106,12 @@ export default function Cart() {
       <View className="border-t border-gray-200 p-4 pb-10">
         <View className="flex-row items-center justify-between py-4">
           <Text className="text-lg font-semibold">Total:</Text>
-          <Text className="text-2xl font-bold text-green-600">
+          <Animated.Text
+            style={{ transform: [{ scale: animatedTotal }] }}
+            className="text-2xl font-bold text-green-600"
+          >
             ${total.toFixed(2)}
-          </Text>
+          </Animated.Text>
         </View>
 
         <View className="gap-4">

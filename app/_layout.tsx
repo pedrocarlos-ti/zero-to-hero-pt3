@@ -46,6 +46,7 @@ export default function RootLayout() {
           name="cart"
           options={{
             title: "Checkout",
+            presentation: "modal",
             headerBackTitle: "Products",
           }}
         />
