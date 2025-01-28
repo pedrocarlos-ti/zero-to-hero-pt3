@@ -14,6 +14,10 @@ const queryClient = new QueryClient({
   },
 });
 
+export const unstable_settings = {
+  initialRouteName: "index",
+};
+
 export default function RootLayout() {
   useReactQueryDevTools(queryClient);
   useMMKVDevTools({ storage });
