@@ -1,6 +1,6 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { getProduct } from "@/utils/api";
 import { ActivityIndicator } from "react-native";
@@ -33,6 +33,7 @@ const Page = () => {
 
   return (
     <View className="flex-1 bg-white">
+      <Stack.Screen options={{ title: product.title }} />
       <ScrollView className="flex-1 bg-white">
         <View className="aspect-square w-full p-4">
           <Image
