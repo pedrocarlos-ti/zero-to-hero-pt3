@@ -2,6 +2,7 @@ import "../global.css";
 import { Stack } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useReactQueryDevTools } from "@dev-plugins/react-query";
+import CartIcon from "@/components/CartIcon";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -21,6 +22,7 @@ export default function RootLayout() {
           options={{
             title: "~ MYSTORE ~",
             headerShadowVisible: false,
+            headerRight: () => <CartIcon />,
             headerSearchBarOptions: {
               placeholder: "Search",
               hideWhenScrolling: true,

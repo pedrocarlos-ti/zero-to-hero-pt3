@@ -6,7 +6,9 @@ import { getProduct } from "@/utils/api";
 import { ActivityIndicator } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Image } from "expo-image";
+import { useCartStore } from "@/store/cartStore";
 const Page = () => {
+  const { addProduct } = useCartStore();
   const { id } = useLocalSearchParams();
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -76,6 +78,7 @@ const Page = () => {
 
       <TouchableOpacity
         activeOpacity={0.8}
+        onPress={() => addProduct(product)}
         className="rounded-sm bg-blue-500 p-4 pb-10"
       >
         <Text className="text-center text-lg font-bold text-white">
