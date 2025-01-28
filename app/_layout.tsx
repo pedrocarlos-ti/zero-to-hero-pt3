@@ -19,13 +19,20 @@ export default function RootLayout() {
         <Stack.Screen
           name="index"
           options={{
-            title: "Zaara",
+            title: "~ MYSTORE ~",
             headerShadowVisible: false,
             headerSearchBarOptions: {
               placeholder: "Search",
               hideWhenScrolling: true,
               hideNavigationBar: true,
             },
+          }}
+        />
+        <Stack.Screen
+          name="product/[id]"
+          options={{
+            title: "Product Details",
+            headerBackTitle: "Back",
           }}
         />
       </Stack>
