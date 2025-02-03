@@ -1,15 +1,55 @@
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, router } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { getProduct } from "@/utils/api";
 import { ActivityIndicator } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useCartStore } from "@/store/cartStore";
+import Animated, {
+  useSharedValue,
+  withSpring,
+  withTiming,
+  withSequence,
+  runOnJS,
+} from "react-native-reanimated";
+
 const Page = () => {
   const { addProduct } = useCartStore();
   const { id } = useLocalSearchParams();
+
+  // Add animated values for toast
+  const toastTranslateY = useSharedValue(100);
+  const toastOpacity = useSharedValue(0);
+
+  const showToast = () => {
+    toastOpacity.value = 1;
+    toastTranslateY.value = withSequence(
+      withSpring(0),
+      withTiming(0, { duration: 800 }),
+      withSpring(100, {}, (finished) => {
+        if (finished) {
+          runOnJS(resetToast)();
+        }
+      }),
+    );
+  };
+
+  const resetToast = () => {
+    toastOpacity.value = 0;
+    toastTranslateY.value = 100;
+  };
+
+  const handleAddToCart = (product) => {
+    addProduct(product);
+    showToast();
+    // Dismiss the page after a short delay
+    setTimeout(() => {
+      router.back();
+    }, 1000);
+  };
+
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: () => getProduct(Number(id)),
@@ -79,13 +119,25 @@ const Page = () => {
 
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => addProduct(product)}
+        onPress={() => handleAddToCart(product)}
         className="rounded-sm bg-blue-500 p-4 pb-10"
       >
         <Text className="text-center text-lg font-bold text-white">
           Add to Cart
         </Text>
       </TouchableOpacity>
+
+      <Animated.View
+        style={{
+          transform: [{ translateY: toastTranslateY }],
+          opacity: toastOpacity,
+        }}
+        className="absolute bottom-20 left-4 right-4 rounded-lg bg-green-500 p-4 shadow-lg"
+      >
+        <Text className="text-center text-lg font-semibold text-white">
+          Added to Cart! 🛍️
+        </Text>
+      </Animated.View>
     </View>
   );
 };

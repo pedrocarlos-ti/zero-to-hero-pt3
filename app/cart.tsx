@@ -1,8 +1,21 @@
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  Dimensions,
+} from "react-native";
 import { useCartStore } from "@/store/cartStore";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, { useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+  useSharedValue,
+  withSpring,
+  withTiming,
+  withSequence,
+  runOnJS,
+} from "react-native-reanimated";
+import { router } from "expo-router";
 
 export default function Cart() {
   const { products, removeProduct, clearCart, updateQuantity } = useCartStore();
@@ -20,6 +33,43 @@ export default function Cart() {
     });
   };
 
+  const checkoutScale = useSharedValue(1);
+  const checkoutOpacity = useSharedValue(1);
+
+  const toastTranslateY = useSharedValue(100);
+  const toastOpacity = useSharedValue(0);
+
+  const showToast = () => {
+    toastOpacity.value = 1;
+    toastTranslateY.value = withSequence(
+      withSpring(0),
+      withTiming(0, { duration: 1000 }),
+      withSpring(100, {}, (finished) => {
+        if (finished) {
+          runOnJS(resetToast)();
+          runOnJS(router.back)();
+        }
+      }),
+    );
+  };
+
+  const resetToast = () => {
+    toastOpacity.value = 0;
+    toastTranslateY.value = 100;
+  };
+
+  const handleCheckout = () => {
+    checkoutScale.value = withSpring(0.8, {}, () => {
+      checkoutOpacity.value = withSpring(0);
+    });
+    showToast();
+    setTimeout(() => {
+      checkoutScale.value = withSpring(1);
+      checkoutOpacity.value = withSpring(1);
+      clearCart();
+    }, 1500);
+  };
+
   if (products.length === 0) {
     return (
       <View className="flex-1 items-center justify-center bg-white p-4">
@@ -32,7 +82,13 @@ export default function Cart() {
 
   return (
     <View className="flex-1 bg-white">
-      <ScrollView className="flex-1">
+      <Animated.ScrollView
+        className="flex-1"
+        style={{
+          transform: [{ scale: checkoutScale }],
+          opacity: checkoutOpacity,
+        }}
+      >
         {products.map((product) => (
           <View
             key={product.id}
@@ -101,7 +157,7 @@ export default function Cart() {
             </View>
           </View>
         ))}
-      </ScrollView>
+      </Animated.ScrollView>
 
       <View className="border-t border-gray-200 p-4 pb-10">
         <View className="flex-row items-center justify-between py-4">
@@ -118,6 +174,7 @@ export default function Cart() {
           <TouchableOpacity
             className="rounded-lg bg-blue-500 p-4"
             activeOpacity={0.8}
+            onPress={handleCheckout}
           >
             <Text className="text-center text-lg font-bold text-white">
               Checkout
@@ -135,6 +192,18 @@ export default function Cart() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Animated.View
+        style={{
+          transform: [{ translateY: toastTranslateY }],
+          opacity: toastOpacity,
+        }}
+        className="absolute bottom-20 left-4 right-4 rounded-lg bg-green-500 p-4 shadow-lg"
+      >
+        <Text className="text-center text-lg font-semibold text-white">
+          Checkout Complete! 🎉
+        </Text>
+      </Animated.View>
     </View>
   );
 }
